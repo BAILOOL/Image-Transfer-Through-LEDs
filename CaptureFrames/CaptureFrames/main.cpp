@@ -26,7 +26,7 @@
 #define high_threshold_LED_3 230
 #define high_threshold_LED_4 230
 
-
+#define FILE_SIZE 4096
 
 using namespace std;
 using namespace cv;
@@ -65,14 +65,8 @@ int average(uchar** Temp, int height, int width)
 
 
 
-#define FILE_SIZE 4096
 unsigned char Buff[4096];
 int temp_count = 0;
-int flag_1 = 0;
-int flag_2 = 0;
-int flag_3 = 0;
-int flag_4 = 0;
-unsigned char Output_Array[FILE_SIZE];
 int time_val = 0;
 bool read1 = false;
 
@@ -94,8 +88,7 @@ int main(int argc, const char** argv)
 	//namedWindow("Red_2", 1);
  
 	//initialize the array
-	for (int i = 0; i<4096; i++)
-		Buff[i] = 255;
+	fill(begin(Buff),begin(Buff)+FILE_SIZE,255);
 
     //create a loop to capture
     while(true)
@@ -104,9 +97,6 @@ int main(int argc, const char** argv)
         //capture a new image frame
         captureDevice>>captureFrame;
 		//imshow("outputCapture", captureFrame);
-
-		int captureH = captureFrame.rows;
-		int captureW = captureFrame.cols;
 
 		Mat LED1(captureFrame(Rect(40,200,50,100)));
 		Mat LED2(captureFrame(Rect(200,200,50,100)));
@@ -150,13 +140,21 @@ int main(int argc, const char** argv)
 		int LED3_Value = average(LED3_Array,height,width);
 		int LED4_Value = average(LED4_Array,height,width);
 		
+		//release the memory
+		delete LED1_Array;
+		delete LED2_Array;
+		delete LED3_Array;
+		delete LED4_Array;
+
+		//for testing values each LED is getting
 		//printf("Average LED1 = %d\n", LED1_Value);
 		//printf("Average LED2 = %d\n", LED2_Value);
 		//printf("Average LED3 = %d\n", LED3_Value);
 		//printf("Average LED4 = %d\n", LED4_Value);
-		printf("current loop = %d\n", time_val%10);
+		//printf("current loop = %d\n", time_val%10);
 		//////////////////////////
 		
+		//skipping every other frame after good value is detected
 		if(read1)
 			{
 				read1=false;
@@ -175,13 +173,9 @@ int main(int argc, const char** argv)
 		}
 
 		
+		//Good value is received. Processing
 		else if (temp_count <=4096 && !read1)
 		{
-			
-			/*printf("LED_1 = %d\n",LED1_Value );
-			printf("LED_2 = %d\n",LED2_Value );
-			printf("LED_3 = %d\n",LED3_Value );
-			printf("LED_4 = %d\n",LED4_Value );*/
 			
 			Buff[temp_count++] = LED1_Value >= high_threshold_LED_1 ? 255:0;
 			Buff[temp_count++] = LED2_Value >= high_threshold_LED_2 ? 255:0;
@@ -199,90 +193,12 @@ int main(int argc, const char** argv)
 			printf("%d", LED3_Value >= high_threshold_LED_3 ? 1:0);
 			printf("%d\n", LED4_Value >= high_threshold_LED_4 ? 1:0);
 			
-			
-			/*
-			if (LED1_Value >= high_threshold_LED_1) 
-			{
-				Buff[temp_count++] = 255;
-				printf("LED_1 = 1 \n");
-				if (flag_1 == 1)
-					//printf("Error_LED1\n");
-					//exit(0);
-				flag_1 = 1;
-			}
-			else if ((LED1_Value >= low_threshold_LED_1_down)&&(LED1_Value <= low_threshold_LED_1_up))
-				{
-					printf("LED_1 = 0 \n");
-					Buff[temp_count++] = 0;
-					flag_1 = 0;
-				}
-			if (LED2_Value >= high_threshold_LED_2) 
-			{
-				Buff[temp_count++] = 255;
-				printf("LED_2 = 1 \n");
-				if (flag_2 == 1)
-					//printf("Error_LED2\n");
-					//exit(0);
-				flag_2 = 1;
-			}
-			else if ((LED2_Value >= low_threshold_LED_2_down)&&(LED2_Value <= low_threshold_LED_2_up))
-				{
-					printf("LED_2 = 0 \n");
-					Buff[temp_count++] = 0;
-					flag_2 = 0;
-				}
-			if (LED3_Value >= high_threshold_LED_3) 
-			{
-				Buff[temp_count++] = 255;
-				printf("LED_3 = 1 \n");
-				if (flag_3 == 1)
-					//printf("Error_LED3\n");
-					//exit(0);
-				flag_3 = 1;
-			}
-			else if ((LED3_Value >= low_threshold_LED_3_down)&&(LED3_Value <= low_threshold_LED_3_up)) 
-				{
-					printf("LED_3 = 0 \n");
-					Buff[temp_count++] = 0;
-					flag_3 = 0;
-				}
-
-			if (LED4_Value >= high_threshold_LED_4) 
-			{
-				Buff[temp_count++] = 255;
-				printf("LED_4 = 1 \n");
-				if (flag_4 == 1)
-					//printf("Error_LED4\n");
-					//exit(0);
-				flag_4 = 1;
-			}
-			else if ((LED4_Value >= low_threshold_LED_4_down)&&(LED4_Value <= low_threshold_LED_4_up)) 
-				{
-					printf("LED_4 = 0 \n");
-					Buff[temp_count++] = 0;
-					flag_4 = 0;
-				}
-
-				//if (LED1_Value >= low_threshold) Buff[temp_count++] = 0;
-			/*
-			if (LED2_Value >= high_threshold) Buff[temp_count++] = 1;
-			else if (LED2_Value >= low_threshold) Buff[temp_count++] = 0;
-
-			if (LED3_Value >= high_threshold) Buff[temp_count++] = 1;
-			else if (LED3_Value >= low_threshold) Buff[temp_count++] = 0;
-
-			if (LED4_Value >= high_threshold) Buff[temp_count++] = 1;
-			else if (LED4_Value >= low_threshold) Buff[temp_count++] = 0;
-			*/
 			read1=true;
 		}
 		
-		
+		printf("INPUT COUNTER = %d\n",temp_count);
 
-
-		
-		printf("TEMP COUNT = %d\n",temp_count);
-
+		//Display the image
 		Mat Final = Mat(64,64,CV_8UC1,Buff);
 		imshow("OUTPUT",Final);
 		if (temp_count >= 4096){
@@ -292,23 +208,10 @@ int main(int argc, const char** argv)
         waitKey(33);
     }
 
-	//int Output_Array[64][64];
-	//int temp = 0;
-
-	//Put buffer into output array
-	//for (int y=0; y<64; ++y)
-	//{
-	//	for (int x=0; x<64;++x)
-	//	{
-	//		Output_Array[y][x] = Buff[temp++];
-	//	}
-	//}
-
-	//display the image
+	//Saving received picture into the raw file
 	printf("Completed");
-	FILE* outputFile = fopen("C:\\Users\\Mid\\Desktop\\Multimedia\\Term Project\\TX part\\panda_output_64.raw","w");
+	FILE* outputFile = fopen("C:\\Users\\Mid\\Desktop\\Multimedia\\Term Project\\Image Transfer Through LEDs\\TX part\\NEW_FILE_NAME.raw","w");
 	fwrite(Buff,FILE_SIZE,1,outputFile);
     return 0;
 
-    //delete shoule be added to release memory
 }
