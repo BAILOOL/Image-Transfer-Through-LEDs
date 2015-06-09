@@ -1,0 +1,6 @@
+To start the program you will need to have OpenCV installed.
+Please use this link: http://opencv.org/downloads.html
+Install Version 2.4.9
+
+Here is the tutorial on how to install OpenCV:
+http://stackoverflow.com/questions/10901905/installing-opencv-2-4-3-in-visual-c-2010-express

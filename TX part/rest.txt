@@ -1,0 +1,50 @@
+incomingChar = Serial.read();
+    current_pixels[++count] = incomingChar;
+    
+    //checking input values
+    
+    if (count == 4)
+    {
+    if (current_pixels[1] == '1') analogWrite(LED_R,255);
+    else if (current_pixels[1] == '0') analogWrite(LED_R,12);
+    else analogWrite(LED_R,0);
+    
+    if (current_pixels[2] == '1') analogWrite(LED_G,255);
+    else if (current_pixels[2] == '0') analogWrite(LED_G,12);
+    else analogWrite(LED_G,0);
+    
+    if (current_pixels[3] == '1') analogWrite(LED_B,255);
+    else if (current_pixels[3] == '0') analogWrite(LED_B,7);
+    else analogWrite(LED_B,0);
+    
+    if (current_pixels[4] == '1') analogWrite(LED_R2,255);
+    else if (current_pixels[4] == '0') analogWrite(LED_R2,9); 
+    else analogWrite(LED_R2,0);
+    
+    delay(5);
+    count = 0;
+    
+    //analogWrite(LED_R,0);
+    //analogWrite(LED_G,0);
+    //analogWrite(LED_B,0);
+    //analogWrite(LED_R2,0);
+    delay(400);
+    
+    
+    //to reset the incoming buffer array with '3's
+    for (int i; i<4; ++i)
+      current_pixels[i] = '3';
+    
+    //to turnoff every LED every cycle
+ }
+ 
+ //Interrupt handling
+ /*
+ if (Serial.available() == 0)
+ {
+   analogWrite(LED_R,0);
+   analogWrite(LED_G,0);
+   analogWrite(LED_B,0);
+   analogWrite(LED_R2,0);
+ }
+   */
